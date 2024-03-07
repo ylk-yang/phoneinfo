@@ -1,0 +1,134 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>详情页面</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #f1f1f1;
+            padding: 10px;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .form-row {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script type="text/javascript" th:src="@{/jquery-1.4.2.min.js}"></script>
+
+
+</head>
+<body>
+
+
+<div class="form-row"  style="display:none;">
+    <input type="text" id="Id" th:value="${informations.id}">
+</div>
+
+<div class="form-row">
+    <h1 id="title" th:text="${informations.title}"></h1>
+</div>
+
+<div class="form-row">
+    <label for="reporttime">发表于：</label>
+    <span id="reporttime" th:text="${#dates.format(informations.reporttime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+</div>
+<div class="form-row">
+    <span type="text" id="content" th:text="${informations.content}"></span>
+</div>
+<div class="form-row">
+    <h2>读者回应</h2>
+    <ul>
+        <li th:each="reply : ${replies}">
+
+            <p>发表时间: <span th:text="${#dates.format(reply.replytime, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+            <span th:text="${reply.content}"></span>
+        </li>
+    </ul>
+</div>
+
+<div class="form-row">
+    <h2>快速回复（字数200以内）：</h2>
+
+        <textarea id="replyContent" rows="4" cols="50" placeholder="请输入回复内容"></textarea>
+        <button id="add-button">提交</button>
+        <a href="/informations/showAll">返回首页</a>
+
+</div>
+
+<script>
+
+
+    $("#add-button").click(function () {
+        var Id =  $("#Id").val();
+        var replyContent = $("#replyContent").val();
+
+
+        // 检查回复内容是否为空
+        if (replyContent.trim() === '') {
+            alert("回复内容不能为空");
+            return;
+        }
+
+        // 检查回复内容是否超过200字
+        if (replyContent.length > 200) {
+            alert("回复内容不能超过200字");
+            return;
+        }
+
+        // 构造请求参数对象
+        var data1 = {
+            id:Id,
+            content: replyContent
+        };
+
+        // 发送保存请求到后端
+        $.ajax({
+            url: "/informations/add",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data1),
+            success: function (data) {
+                if (data.code === 0) {
+                    alert("成功");
+                    //刷新页面
+                    window.location.href = window.location.href;
+                } else {
+                    alert("回复失败");
+                }
+
+            },
+            error: function () {
+                // 添加失败，提示错误并返回添加页面
+                alert("回复失败，请重试");
+                // 或者进行其他错误处理操作
+            }
+        });
+    });
+
+
+
+</script>
+</body>
+</html>

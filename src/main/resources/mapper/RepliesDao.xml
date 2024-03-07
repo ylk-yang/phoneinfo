@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.phoneinfo.dao.RepliesDao">
+
+    <resultMap type="com.example.phoneinfo.entity.Replies" id="RepliesMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="replytime" column="replyTime" jdbcType="TIMESTAMP"/>
+        <result property="infoid" column="infoId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询所有-->
+    <select id="queryAllById" resultMap="RepliesMap">
+        select id,
+               content,
+               replyTime,
+               infoId
+        from replies
+        where infoId = #{id}
+    </select>
+    <!--查询单个-->
+    <select id="queryById" resultMap="RepliesMap">
+        select id,
+               content,
+               replyTime,
+               infoId
+        from replies
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="RepliesMap">
+        select
+        id, content, replyTime, infoId
+        from replies
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="replytime != null">
+                and replyTime = #{replytime}
+            </if>
+            <if test="infoid != null">
+                and infoId = #{infoid}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from replies
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="replytime != null">
+                and replyTime = #{replytime}
+            </if>
+            <if test="infoid != null">
+                and infoId = #{infoid}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into replies(content, replyTime, infoId)
+        values (#{content}, #{replytime}, #{infoid})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into replies(content, replyTime, infoId)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.content}, #{entity.replytime}, #{entity.infoid})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into replies(content, replyTime, infoId)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.content}, #{entity.replytime}, #{entity.infoid})
+        </foreach>
+        on duplicate key update
+        content = values(content),
+        replyTime = values(replyTime),
+        infoId = values(infoId)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update replies
+        <set>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="replytime != null">
+                replyTime = #{replytime},
+            </if>
+            <if test="infoid != null">
+                infoId = #{infoid},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from replies
+        where id = #{id}
+    </delete>
+
+</mapper>
+

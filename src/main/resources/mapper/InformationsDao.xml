@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.phoneinfo.dao.InformationsDao">
+
+    <resultMap type="com.example.phoneinfo.entity.Informations" id="InformationsMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="replycount" column="replyCount" jdbcType="INTEGER"/>
+        <result property="viewcount" column="viewCount" jdbcType="INTEGER"/>
+        <result property="reporttime" column="reportTime" jdbcType="TIMESTAMP"/>
+        <result property="lastposttime" column="lastPostTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询所有-->
+    <select id="getAll" resultMap="InformationsMap">
+        select id,
+               title,
+               content,
+               replyCount,
+               viewCount,
+               reportTime,
+               lastPostTime
+        from informations  ORDER BY lastPostTime DESC;
+    </select>
+
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="InformationsMap">
+        select id,
+               title,
+               content,
+               replyCount,
+               viewCount,
+               reportTime,
+               lastPostTime
+        from informations
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="InformationsMap">
+        select
+        id, title, content, replyCount, viewCount, reportTime, lastPostTime
+        from informations
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="title != null and title != ''">
+                and title = #{title}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="replycount != null">
+                and replyCount = #{replycount}
+            </if>
+            <if test="viewcount != null">
+                and viewCount = #{viewcount}
+            </if>
+            <if test="reporttime != null">
+                and reportTime = #{reporttime}
+            </if>
+            <if test="lastposttime != null">
+                and lastPostTime = #{lastposttime}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from informations
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="title != null and title != ''">
+                and title = #{title}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="replycount != null">
+                and replyCount = #{replycount}
+            </if>
+            <if test="viewcount != null">
+                and viewCount = #{viewcount}
+            </if>
+            <if test="reporttime != null">
+                and reportTime = #{reporttime}
+            </if>
+            <if test="lastposttime != null">
+                and lastPostTime = #{lastposttime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into informations(title, content, replyCount, viewCount, reportTime, lastPostTime)
+        values (#{title}, #{content}, #{replycount}, #{viewcount}, #{reporttime}, #{lastposttime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into informations(title, content, replyCount, viewCount, reportTime, lastPostTime)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.title}, #{entity.content}, #{entity.replycount}, #{entity.viewcount}, #{entity.reporttime},
+            #{entity.lastposttime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into informations(title, content, replyCount, viewCount, reportTime, lastPostTime)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.title}, #{entity.content}, #{entity.replycount}, #{entity.viewcount}, #{entity.reporttime},
+            #{entity.lastposttime})
+        </foreach>
+        on duplicate key update
+        title = values(title),
+        content = values(content),
+        replyCount = values(replyCount),
+        viewCount = values(viewCount),
+        reportTime = values(reportTime),
+        lastPostTime = values(lastPostTime)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update informations
+        <set>
+            <if test="title != null and title != ''">
+                title = #{title},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="replycount != null">
+                replyCount = #{replycount},
+            </if>
+            <if test="viewcount != null">
+                viewCount = #{viewcount},
+            </if>
+            <if test="reporttime != null">
+                reportTime = #{reporttime},
+            </if>
+            <if test="lastposttime != null">
+                lastPostTime = #{lastposttime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from informations
+        where id = #{id}
+    </delete>
+
+</mapper>
+

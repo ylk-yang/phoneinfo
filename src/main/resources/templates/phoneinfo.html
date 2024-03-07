@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html>
+    <title>手机咨讯</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #f1f1f1;
+            padding: 10px;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+    <script type="text/javascript" th:src="@{/jquery-1.4.2.min.js}"></script>
+</head>
+<body>
+<h1>手机资讯</h1>
+
+<table id="data-table">
+    <tr>
+        <th>序号</th>
+        <th>标题</th>
+        <th>回复/查看</th>
+        <th>发表时间</th>
+        <th>最新回复</th>
+    </tr>
+</table>
+
+<script>
+    // 格式化日期
+    function formatDate(date) {
+        var formattedDate = new Date(date);
+
+        var year = formattedDate.getFullYear();
+        var month = ('0' + (formattedDate.getMonth() + 1)).slice(-2);
+        var day = ('0' + formattedDate.getDate()).slice(-2);
+        var hours = ('0' + formattedDate.getHours()).slice(-2);
+        var minutes = ('0' + formattedDate.getMinutes()).slice(-2);
+        var seconds = ('0' + formattedDate.getSeconds()).slice(-2);
+
+        var formattedDateString = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+
+        return formattedDateString;
+
+    }
+    // 使用Ajax异步请求后台方法
+    function loadData() {
+        // 异步请求后端数据
+        $.ajax({
+            url: "/informations/getAll",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                if (data.length > 0) {
+                    // 如果有数据，则进行处理和显示
+                    var tableHtml = "<table><tr>" +
+                        "<th>序号</th>" +
+                        "<th>标题</th>" +
+                        "<th>回复数/查看数</th>" +
+                        "<th>发表时间</th>" +
+                        "<th>最新回复时间</th></tr>";
+
+                    for (var i = 0; i < data.length; i++) {
+                        var row = data[i];
+                        tableHtml += "<tr>";
+                        tableHtml += "<td>" + row.id + "</td>";
+                        tableHtml += "<td><a href='/informations/details/" + row.id + "'>" + row.title + "</a></td>";
+                        tableHtml += "<td>" + row.replycount + "/" + row.viewcount + "</td>";
+                        tableHtml += "<td>" + formatDate(row.reporttime) + "</td>";
+                        tableHtml += "<td>" + formatDate(row.lastposttime) + "</td>";
+                        tableHtml += "</tr>";
+                    }
+
+                    tableHtml += "</table>";
+
+
+                    $("#data-table").html(tableHtml);
+                } else {
+                    // 如果没有数据，则显示提示信息
+                    $("#data-table").html("抱歉，无数据");
+                }
+            },
+            error: function () {
+                // 请求失败时的处理
+                console.log("请求数据失败");
+            }
+        });
+    };
+
+
+    // 页面加载完成后调用loadData方法获取数据并渲染
+    window.onload = function () {
+        loadData();
+    };
+</script>
+</body>
+</html>
