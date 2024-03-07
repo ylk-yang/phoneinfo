@@ -22,5 +22,11 @@ mybatis:
   mapper-locations: classpath:mapper/*Dao.xml
   type-aliases-package: com.entity
 
-logging.level.org.springframework.boot.autoconfigure: error
+#logging.level.org.springframework.boot.autoconfigure: error
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          autoconfigure: error
 
